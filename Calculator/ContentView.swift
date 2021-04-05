@@ -10,11 +10,20 @@ import SwiftUI
 
 struct ContentView: View {
     enum Operation: String, CaseIterable {
-        case adddition = "+"
-        case subtraction = "-"
-        case multiplication = "*"
         case division = "/"
+        case multiplication = "*"
+        case subtraction = "-"
+        case adddition = "+"
     }
+    private let numbers = [["7", "4","1", " "],
+                           ["8", "5", "2", "0"],
+                           ["9", "6", "3", "."]]
+
+        
+//                            ["7", "8", "9"],
+//                            ["4", "5", "6"],
+//                            ["1", "2", "3"],
+//                            ["0", ".",]]
     
     @State private var result = ""
     @State private var tempNumber = ""
@@ -52,37 +61,41 @@ struct ContentView: View {
         NavigationView {
             VStack {
                 HStack {
-                    ForEach(0..<10) { number in
-                        Button("\(number)") {
-                            if (self.operationButtonPressed || self.result == "0") {
-                                self.previousNumber = self.tempNumber
-                                self.tempNumber = String(number)
-                                self.operationButtonPressed = false
-                            } else {
-                                self.tempNumber += String(number)
+                    ForEach(numbers, id: \.self) { number in
+                        VStack {
+                            ForEach(number, id: \.self) { number in
+                                Button("\(number)") {
+                                    if (number == " ") {
+                                        return
+                                    }
+                                    if (self.operationButtonPressed || self.result == "0") {
+                                        self.previousNumber = self.tempNumber
+                                        self.tempNumber = String(number)
+                                        self.operationButtonPressed = false
+                                    } else {
+                                        self.tempNumber += String(number)
+                                    }
+                                    self.result = self.tempNumber
+                                }
                             }
-                            self.result = self.tempNumber
                         }
                     }
-                    Button(".") {
-                        self.tempNumber += "."
-                    }
-                }
-                
-                HStack {
-                    ForEach(Operation.allCases, id: \.self) { operation in
-                        Button("\(operation.rawValue)") {
+                    
+                    VStack {
+                        ForEach(Operation.allCases, id: \.self) { operation in
+                            Button("\(operation.rawValue)") {
+                                self.operationButtonPressed = true
+                                if (self.calculated) {
+                                    self.tempNumber = self.previousNumber
+                                    self.calculated = false
+                                }
+                                self.operationPressed(operation)
+                            }
+                        }
+                        Button("=") {
                             self.operationButtonPressed = true
-                            if (self.calculated) {
-                                self.tempNumber = self.previousNumber
-                                self.calculated = false
-                            }
-                            self.operationPressed(operation)
+                            self.equalsPressed()
                         }
-                    }
-                    Button("=") {
-                        self.operationButtonPressed = true
-                        self.equalsPressed()
                     }
                 }
                 
