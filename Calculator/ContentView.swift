@@ -15,17 +15,12 @@ struct ContentView: View {
         case subtraction = "-"
         case adddition = "+"
     }
-    private let numbers = [["7", "4","1", " "],
-                           ["8", "5", "2", "0"],
-                           ["9", "6", "3", "."]]
-
-        
-//                            ["7", "8", "9"],
-//                            ["4", "5", "6"],
-//                            ["1", "2", "3"],
-//                            ["0", ".",]]
+    private let numbers = [ ["7", "8", "9"],
+                            ["4", "5", "6"],
+                            ["1", "2", "3"],
+                            [" ", "0", "."] ]
     
-    @State private var result = ""
+    @State private var result = "0"
     @State private var tempNumber = ""
     @State private var previousNumber = ""
     @State private var calculated = false
@@ -60,22 +55,36 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             VStack {
+                Text("\(result)").bold()
+                
                 HStack {
-                    ForEach(numbers, id: \.self) { number in
+                    VStack {
+                        HStack {
+                            Button("Clear All") {
+                                self.result = "0"
+                                self.tempNumber = ""
+                                self.previousNumber = ""
+                                self.calculated = false
+                            }
+                        }
                         VStack {
-                            ForEach(number, id: \.self) { number in
-                                Button("\(number)") {
-                                    if (number == " ") {
-                                        return
+                            ForEach(numbers, id: \.self) { number in
+                                HStack {
+                                    ForEach(number, id: \.self) { number in
+                                        Button("\(number)") {
+                                            if (number == " ") {
+                                                return
+                                            }
+                                            if (self.operationButtonPressed || self.result == "0") {
+                                                self.previousNumber = self.tempNumber
+                                                self.tempNumber = String(number)
+                                                self.operationButtonPressed = false
+                                            } else {
+                                                self.tempNumber += String(number)
+                                            }
+                                            self.result = self.tempNumber
+                                        }
                                     }
-                                    if (self.operationButtonPressed || self.result == "0") {
-                                        self.previousNumber = self.tempNumber
-                                        self.tempNumber = String(number)
-                                        self.operationButtonPressed = false
-                                    } else {
-                                        self.tempNumber += String(number)
-                                    }
-                                    self.result = self.tempNumber
                                 }
                             }
                         }
@@ -103,19 +112,12 @@ struct ContentView: View {
                 Text("Num1: \(previousNumber)")
                 Text("Operator: \(currentOperation.rawValue)")
                 Text("Num2: \(tempNumber)")
-                
-                Button("Clear All") {
-                    self.result = ""
-                    self.tempNumber = ""
-                    self.previousNumber = ""
-                    self.calculated = false
-                }
             }
             .navigationBarTitle("Calculator")
         }
     }
 }
-
+    
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
