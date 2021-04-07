@@ -8,7 +8,47 @@
 
 import SwiftUI
 
+struct ButtonStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .foregroundColor(Color.white)
+            .font(.title)
+            .padding()
+            .border(Color.blue)
+            .background(Color.blue)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .padding()
+        
+            
+    }
+}
+
+struct ResultStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .foregroundColor(Color.white)
+            .font(.system(size: 60))
+            .padding()
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+            .border(Color.blue)
+            .background(Color.blue)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .padding()
+    }
+}
+
+extension View {
+    func buttonStyle() -> some View {
+        self.modifier(ButtonStyle())
+    }
+    
+    func resultStyle() -> some View {
+        self.modifier(ResultStyle())
+    }
+}
+
 struct ContentView: View {
+
     enum Operation: String, CaseIterable {
         case division = "/"
         case multiplication = "*"
@@ -50,12 +90,18 @@ struct ContentView: View {
         calculated = true
         
         debugPrint("Actual calculation: \(num1) \(currentOperation.rawValue) \(num2)")
+        debugPrint("Result: \(result)")
+        debugPrint("Num1: \(previousNumber)")
+        debugPrint("Operator: \(currentOperation.rawValue)")
+        debugPrint("Num2: \(tempNumber)")
     }
     
     var body: some View {
-        NavigationView {
+        ZStack {
+            Color.black.edgesIgnoringSafeArea(.all)
             VStack {
-                Text("\(result)").bold()
+                Text("\(result)")
+                    .resultStyle()
                 
                 HStack {
                     VStack {
@@ -65,7 +111,7 @@ struct ContentView: View {
                                 self.tempNumber = ""
                                 self.previousNumber = ""
                                 self.calculated = false
-                            }
+                            }.buttonStyle()
                         }
                         VStack {
                             ForEach(numbers, id: \.self) { number in
@@ -83,7 +129,7 @@ struct ContentView: View {
                                                 self.tempNumber += String(number)
                                             }
                                             self.result = self.tempNumber
-                                        }
+                                        }.buttonStyle()
                                     }
                                 }
                             }
@@ -99,24 +145,19 @@ struct ContentView: View {
                                     self.calculated = false
                                 }
                                 self.operationPressed(operation)
-                            }
+                            }.buttonStyle()
                         }
                         Button("=") {
                             self.operationButtonPressed = true
                             self.equalsPressed()
-                        }
+                        }.buttonStyle()
                     }
                 }
-                
-                Text("\(result)")
-                Text("Num1: \(previousNumber)")
-                Text("Operator: \(currentOperation.rawValue)")
-                Text("Num2: \(tempNumber)")
             }
-            .navigationBarTitle("Calculator")
         }
     }
 }
+
     
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
